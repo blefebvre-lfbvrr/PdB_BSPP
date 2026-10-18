@@ -214,7 +214,7 @@ export function complementaireText(s) {
     blocks.push(lines);
   }
   blocks.push(groupLines(group('parametres'), s));
-  blocks.push(groupLines(group('sample'), s));
+  blocks.push(groupLines(group('mhta'), s));
   return blocks.filter((b) => b.length).map((b) => b.join('\n')).join('\n\n');
 }
 

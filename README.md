@@ -18,8 +18,8 @@ et effacé avec « Supprimer ce bilan ».
 | **B** · Respiration | Signes de détresse, FR (ample, régulière, symétrique…), SpO2 à l’air ou sous O2 (débit, masque). |
 | **C** · Circulation | Signes de détresse, arrêt cardiaque (heure, témoin, RCP, DAE et chocs), FC, pouls, TA droite / gauche / habituelle, TRC. |
 | **D** · Neurologique | Signes de détresse, Glasgow détaillé, PC, orientation, pupilles, motricité / sensibilité, FAST et heure des premiers signes. |
-| Bilan compl. | **Bilans spécifiques** du mémo (malaise, douleur thoracique, asthme / OAP, douleur abdominale, AVC, convulsions, méningite, TC, traumatisme avec fiches lésion, rachis, plaie / brûlure, intoxication, grossesse / accouchement, hyper / hypothermie), **OPQRST**, signes associés, glycémie / température, **AMPLE**. |
-| Gestes | Position d’attente, gestes, transmission (18 / 15 / 17, contact urgent), devenir (évacuation, LSP, refus avec décharge…), horaires. |
+| Bilan compl. | **Bilans spécifiques** du mémo (malaise, douleur thoracique, asthme / OAP, douleur abdominale, AVC, convulsions, méningite, TC, traumatisme avec fiches lésion, rachis, plaie / brûlure, intoxication, grossesse / accouchement, hyper / hypothermie), **OPQRST**, signes associés, glycémie / température, antécédents **MHTA** (comme eFiBi). |
+| Gestes | Position d’attente, gestes, transmission (CM, 18 / 15 / 17, contact urgent), devenir (évacuation, LSP, refus avec décharge…), horaires. |
 | Surveillance | Une série de constantes horodatée à chaque contrôle, avec l’évolution. |
 | Identité | Nom, naissance, adresse, téléphone, personne à prévenir. |
 | Bilan | Texte prêt à transmettre : **synthèse**, circonstanciel, bilan vital (détresses en tête), complémentaire, gestes, surveillance, devenir, identité. Un bouton « Copier » par partie. |

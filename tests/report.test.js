@@ -25,7 +25,7 @@ const thoracique = {
   gly: '1.05', gly_unite: 'g/L', temp: '36.8', temp_site: 'tympanique',
   allergies: 'Aucune', traitements: 'Kardegic', atcd: 'HTA', dernier_repas: '12:30',
   position: 'demi_assise', gestes: ['protection', 'surveillance'],
-  transmis: ['18', '15'], heure_transmis: '14:12', contact_urgent: 'oui',
+  transmis: ['cm', '15'], heure_transmis: '14:12', contact_urgent: 'oui',
   devenir: 'evac', evac_dest: 'les urgences de Lariboisière', evac_par: 'ar',
   surv: [{ heure: '14:20', fr: '18', sat: '97', sat_sous: 'O2', fc: '96', ta: '130/85', evolution: 'mieux' }],
   nom: 'Martin', prenom: 'Paul', ddn: '1968-02-03',
@@ -66,8 +66,8 @@ test('circonstanciel, complémentaire, transmission', () => {
   const compl = section(r, 'complementaire');
   assert.match(compl, /Douleur thoracique :\nPas d’effort particulier\nIrradiation : la mâchoire et le bras gauche/);
   assert.match(compl, /Écart TAD \/ TAG : 25 mmHg \(> 20 : dissection \?\)/);
-  assert.match(compl, /Pas d’allergie connue\nTraitement : Kardegic\nATCD : HTA\nDernier repas à 12h30/);
-  assert.match(section(r, 'devenir'), /^Bilan transmis au 18 et au 15 à 14h12 \(contact urgent\)/);
+  assert.match(compl, /ATCD : HTA\nTraitement : Kardegic\nPas d’allergie connue\nDernier repas à 12h30/);
+  assert.match(section(r, 'devenir'), /^Bilan transmis à la CM et au 15 à 14h12 \(contact urgent\)/);
   assert.match(section(r, 'surveillance'), /^14h20 : FR 18, SpO2 97 % sous O2, FC 96, TA 130\/85, amélioration$/);
 });
 

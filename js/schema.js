@@ -1560,20 +1560,22 @@ export const TABS = [
         memo: MEMO.glycemie,
       },
       {
-        id: 'sample',
-        title: 'Antécédents : A · M · P · L · E',
+        id: 'mhta',
+        title: 'Antécédents : M · H · T · A',
+        hint: 'Comme dans eFiBi : maladies, hospitalisations, traitements, allergies.',
         fields: [
-          area('allergies', 'A · Allergies', { none: 'Aucune', fmt: (v) => `Allergies : ${v}`, noneOut: 'Pas d’allergie connue' }),
-          area('traitements', 'M · Médicaments', { none: 'Aucun', fmt: (v) => `Traitement : ${v}`, noneOut: 'Pas de traitement' }),
+          area('atcd', 'M · Maladies', { none: 'Aucune', fmt: (v) => `ATCD : ${v}`, noneOut: 'Pas d’ATCD' }),
+          area('hospit', 'H · Hospitalisations, opérations', { none: 'Aucune', fmt: (v) => `Hospitalisations : ${v}`, noneOut: 'Pas d’hospitalisation' }),
+          area('traitements', 'T · Traitements', { none: 'Aucun', fmt: (v) => `Traitement : ${v}`, noneOut: 'Pas de traitement' }),
           tri('ordonnance', 'Ordonnance disponible', 'Ordonnance disponible', 'Pas d’ordonnance'),
-          area('atcd', 'P · Passé médical', { none: 'Aucun', fmt: (v) => `ATCD : ${v}`, noneOut: 'Pas d’ATCD' }),
-          text('hospit', 'Hospitalisation récente', { none: 'Aucune', fmt: (v) => `Hospitalisation récente : ${v}`, noneOut: 'Pas d’hospitalisation récente' }),
-          text('dernier_repas', 'L · Dernier repas', {
+          area('allergies', 'A · Allergies', { none: 'Aucune', fmt: (v) => `Allergies : ${v}`, noneOut: 'Pas d’allergie connue' }),
+          { type: 'subtitle', label: 'Autres' },
+          text('dernier_repas', 'Dernier repas', {
             placeholder: 'à 13h, il y a 2h, ce midi…',
             // « 13h » ou « 13:00 » → « Dernier repas à 13h » ; sinon le texte tel quel.
             fmt: (v) => (/^\d/.test(v) ? `Dernier repas à ${fmtTime(v)}` : `Dernier repas ${v}`),
           }),
-          area('evenements', 'E · Événements ayant conduit à la situation', { fmt: (v) => `Événements : ${v}` }),
+          area('evenements', 'Événements ayant conduit à la situation', { fmt: (v) => `Événements : ${v}` }),
         ],
       },
     ],
@@ -1638,15 +1640,16 @@ export const TABS = [
         id: 'transmission',
         title: 'Transmission du bilan',
         fields: [
-          checks('transmis', 'Bilan transmis au', [
-            { v: '18', l: '18 (BSPP)', out: '18' },
-            { v: '15', l: '15 (SAMU)', out: '15' },
-            { v: '17', l: '17 (Police)', out: '17' },
+          checks('transmis', 'Bilan transmis', [
+            { v: 'cm', l: 'CM (coordination médicale)', out: 'à la CM' },
+            { v: '18', l: '18 (BSPP)', out: 'au 18' },
+            { v: '15', l: '15 (SAMU)', out: 'au 15' },
+            { v: '17', l: '17 (Police)', out: 'au 17' },
           ], {
             out: (v, s) => {
               const to = (v || []).map((k) => optOut('transmis', k));
               if (!to.length && !s.heure_transmis) return null;
-              return `Bilan transmis${to.length ? ` ${joinEt(to.map((x) => `au ${x}`))}` : ''}${s.heure_transmis ? ` à ${fmtTime(s.heure_transmis)}` : ''}${s.contact_urgent === 'oui' ? ' (contact urgent)' : ''}`;
+              return `Bilan transmis${to.length ? ` ${joinEt(to)}` : ''}${s.heure_transmis ? ` à ${fmtTime(s.heure_transmis)}` : ''}${s.contact_urgent === 'oui' ? ' (contact urgent)' : ''}`;
             },
           }),
           time('heure_transmis', 'À', { out: silent }),
