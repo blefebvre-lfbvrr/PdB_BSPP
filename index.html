@@ -44,53 +44,17 @@
       <div class="summary" id="summary"></div>
       <div class="group">
         <p class="hint">
-          Rien n’est envoyé sur Internet. La synthèse sert à passer le bilan au téléphone ;
-          enregistrez le bilan complet dans l’app Notes pour remplir la fiche.
+          Lisez le bilan à votre chef, ou envoyez-le-lui par message.
+          Tout reste sur ce téléphone tant que vous ne l’envoyez pas.
         </p>
         <div class="actions">
-          <button type="button" class="btn primary" id="btn-share">Enregistrer dans Notes</button>
+          <button type="button" class="btn primary" id="btn-read">Lire le bilan au chef</button>
+          <button type="button" class="btn" id="btn-send">Envoyer par message</button>
           <button type="button" class="btn" id="btn-copy-all">Copier tout</button>
-          <button type="button" class="btn" id="btn-share-sheet" hidden>Autre app…</button>
         </div>
         <div id="missing" class="missing" hidden></div>
       </div>
 
-      <details class="group settings" id="direct-settings">
-        <summary>
-          <span class="settings-title">Enregistrement direct dans Notes</span>
-          <span class="pill" id="direct-pill">Désactivé</span>
-        </summary>
-        <div class="settings-body">
-          <p class="hint">
-            Sur iPhone, un raccourci de l’app Raccourcis crée la note à votre place : plus besoin de
-            choisir Notes dans le menu de partage. Tout reste sur le téléphone.
-          </p>
-          <ol class="steps">
-            <li>Ouvrez l’app <strong>Raccourcis</strong> et touchez <strong>+</strong> pour créer un raccourci.</li>
-            <li>Ajoutez l’action <strong>Créer une note</strong> (app Notes).</li>
-            <li>Dans cette action, touchez le texte de la note et choisissez <strong>Entrée du raccourci</strong>.
-              Vous pouvez aussi choisir un dossier, par exemple «&nbsp;Bilans&nbsp;».</li>
-            <li>Renommez le raccourci <strong id="steps-name">PdB</strong> (touchez son nom en haut), puis <strong>OK</strong>.</li>
-            <li>Ici, activez l’option ci-dessous et touchez <strong>Créer une note de test</strong>.
-              La première fois, autorisez Raccourcis à accéder à Notes.</li>
-          </ol>
-          <div class="field">
-            <label for="shortcut-name">Nom du raccourci</label>
-            <input type="text" id="shortcut-name" autocomplete="off" autocapitalize="off" spellcheck="false">
-          </div>
-          <div class="field tri">
-            <span class="label">Utiliser le raccourci pour «&nbsp;Enregistrer&nbsp;»</span>
-            <div class="seg" role="group">
-              <button type="button" class="opt" id="direct-on" aria-pressed="false">Oui</button>
-              <button type="button" class="opt no" id="direct-off" aria-pressed="true">Non</button>
-            </div>
-          </div>
-          <button type="button" class="btn block" id="btn-test-shortcut">Créer une note de test</button>
-          <p class="help">
-            iOS peut demander «&nbsp;Ouvrir dans Raccourcis&nbsp;?&nbsp;» : touchez Ouvrir, puis revenez à l’app d’un glissement.
-          </p>
-        </div>
-      </details>
       <div id="report-sections"></div>
       <div class="end-actions">
         <button type="button" class="btn" id="btn-new-bottom">Nouvelle victime</button>
@@ -114,9 +78,29 @@
       <ul class="victims" id="victims"></ul>
       <button type="button" class="btn primary block" id="btn-new">+ Nouvelle victime</button>
       <p class="hint small">
-        Les bilans restent uniquement sur ce téléphone. Supprimez-les une fois enregistrés dans Notes.
+        Les bilans restent uniquement sur ce téléphone. Supprimez-les une fois rendus au chef.
       </p>
     </div>
+  </div>
+
+  <!-- Bilan à lire au chef : plein écran, gros caractères, une partie par bloc. -->
+  <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="reader-title" hidden>
+    <header class="reader-head">
+      <div class="reader-title">
+        <h2 id="reader-title">Bilan</h2>
+        <span class="reader-sub" id="reader-sub"></span>
+      </div>
+      <div class="reader-zoom" role="group" aria-label="Taille du texte">
+        <button type="button" class="btn mini" id="btn-zoom-out" aria-label="Texte plus petit">A−</button>
+        <button type="button" class="btn mini" id="btn-zoom-in" aria-label="Texte plus grand">A+</button>
+      </div>
+      <button type="button" class="btn mini" id="btn-reader-close">Fermer</button>
+    </header>
+    <div class="reader-body" id="reader-body"></div>
+    <footer class="reader-foot">
+      <button type="button" class="btn" id="btn-reader-copy">Copier</button>
+      <button type="button" class="btn primary" id="btn-reader-send">Envoyer par message</button>
+    </footer>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

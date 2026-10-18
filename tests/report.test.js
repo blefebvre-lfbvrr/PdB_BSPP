@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildReport, computeAge, detresseStatus, formatTA, suggestions,
+  buildReport, computeAge, detresseStatus, formatTA, readerBlocks, suggestions,
 } from '../js/report.js';
 import { malinas, rachisDecision, taParts, tempWarn } from '../js/schema.js';
 
@@ -160,4 +160,23 @@ test('tension : barre ajoutée automatiquement', () => {
 test('pas de ligne vide quand une partie n’est pas renseignée', () => {
   const r = buildReport({ spe: ['malaise', 'intox'], dernier_repas: 'ce midi', sat_sous: 'AA', gly_unite: 'g/L' });
   assert.equal(section(r, 'complementaire'), 'Dernier repas ce midi');
+});
+
+test('lecture au chef : un bloc par partie, détresses avant X A B C D', () => {
+  const blocks = readerBlocks(thoracique);
+  assert.deepEqual(blocks.map((b) => b.key),
+    ['synthese', 's', 'detresse', 'x', 'a', 'b', 'c', 'd', 'complementaire', 'gestes', 'surveillance', 'devenir', 'identite']);
+  const det = blocks.find((b) => b.key === 'detresse');
+  assert.equal(det.level, 'alert');
+  assert.deepEqual(det.lines, ['C – Circulation : pâleur, sueurs froides']);
+  assert.deepEqual(blocks.find((b) => b.key === 'x').lines, ['Pas d’hémorragie']);
+  assert.equal(blocks.find((b) => b.key === 'b').letter, 'B');
+  assert.deepEqual(readerBlocks({}), []);
+  const ok = readerBlocks({ sd_x: ['aucun'], sd_a: ['aucun'], sd_b: ['aucun'], sd_c: ['aucun'], sd_d: ['aucun'] });
+  assert.deepEqual(ok.find((b) => b.key === 'detresse'), { key: 'detresse', title: 'Pas de détresse vitale', lines: [], level: 'ok' });
+});
+
+test('bilan rendu au chef', () => {
+  const r = buildReport({ transmis: ['chef'], heure_transmis: '14:30' });
+  assert.equal(section(r, 'devenir'), 'Bilan transmis au chef à 14h30');
 });

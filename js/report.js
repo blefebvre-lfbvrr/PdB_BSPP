@@ -180,11 +180,18 @@ export function detresseLines(s) {
   return [];
 }
 
-// Bloc d'une lettre : « B – Respiration : » puis les constatations (sur une ligne s'il n'y en a qu'une).
-export function lettreLines(g, s) {
+// Constatations d'une lettre (les signes de détresse sont repris à part, en tête).
+function lettreBody(g, s) {
   const sd = SIGNES_DETRESSE.find((x) => x.name === g.vital);
   const lines = expandFields(g.fields).flatMap((f) => fieldLines(f, s));
   if (has(s, sd.name, 'aucun')) lines.push(sd.none);
+  return lines;
+}
+
+// Bloc d'une lettre : « B – Respiration : » puis les constatations (sur une ligne s'il n'y en a qu'une).
+export function lettreLines(g, s) {
+  const sd = SIGNES_DETRESSE.find((x) => x.name === g.vital);
+  const lines = lettreBody(g, s);
   if (!lines.length) return [];
   const head = `${sd.letter} – ${sd.title} :`;
   return lines.length === 1 ? [`${head} ${lines[0]}`] : [head, ...lines];
@@ -343,6 +350,34 @@ export function buildReport(s) {
   if (types.length) head.push(`Bilan spécifique : ${types.join(', ')}`);
   const body = sections.filter((x) => x.text).map((x) => `${x.title}\n${x.text}`);
   return { title, sections, full: [head.join('\n'), ...body].join('\n\n') + '\n' };
+}
+
+// ---------------------------------------------------------------------------
+// Bilan à lire au chef : un bloc par partie, dans l'ordre où on le donne
+// (en bref, circonstanciel, détresses, X A B C D, complémentaire…).
+// ---------------------------------------------------------------------------
+export function readerBlocks(s) {
+  const blocks = [];
+  const add = (key, title, text, extra = {}) => {
+    if (text) blocks.push({ key, title, lines: text.split('\n'), ...extra });
+  };
+  add('synthese', 'En bref', syntheseText(s));
+  add('s', 'Circonstanciel', circonstancielText(s), { letter: 'S' });
+  const det = detresseLines(s);
+  if (det.length > 1) blocks.push({ key: 'detresse', title: 'Signes de détresse', lines: det.slice(1), level: 'alert' });
+  else if (det.length) blocks.push({ key: 'detresse', title: det[0], lines: [], level: 'ok' });
+  for (const id of LETTRES) {
+    const g = group(id);
+    const sd = SIGNES_DETRESSE.find((x) => x.name === g.vital);
+    const lines = lettreBody(g, s);
+    if (lines.length) blocks.push({ key: id, letter: sd.letter, title: sd.title, lines });
+  }
+  add('complementaire', 'Bilan complémentaire', complementaireText(s));
+  add('gestes', 'Gestes effectués', gestesText(s));
+  add('surveillance', 'Surveillance', surveillanceText(s));
+  add('devenir', 'Transmission et devenir', devenirText(s));
+  add('identite', 'Identité', identiteText(s));
+  return blocks;
 }
 
 // ---------------------------------------------------------------------------

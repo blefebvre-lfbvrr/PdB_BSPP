@@ -1641,6 +1641,7 @@ export const TABS = [
         title: 'Transmission du bilan',
         fields: [
           checks('transmis', 'Bilan transmis', [
+            { v: 'chef', l: 'Au chef (chef d’agrès, chef d’équipe)', out: 'au chef' },
             { v: 'cm', l: 'CM (coordination médicale)', out: 'à la CM' },
             { v: '18', l: '18 (BSPP)', out: 'au 18' },
             { v: '15', l: '15 (SAMU)', out: 'au 15' },

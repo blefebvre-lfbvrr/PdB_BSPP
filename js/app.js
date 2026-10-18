@@ -1,6 +1,7 @@
 import { TABS, SIGNES_DETRESSE, SURV_FIELDS, SURV_EVOLUTION, LESION_SIGNES, has, hasSome, fmtTime } from './schema.js';
 import {
-  buildReport, computeAge, detresseStatus, expandFields, formatTA, gcsTotal, identiteRows, infoValue, isVisible, suggestions, victimSummary,
+  buildReport, computeAge, detresseStatus, expandFields, formatTA, gcsTotal, identiteRows, infoValue, isVisible, readerBlocks,
+  suggestions, victimSummary,
 } from './report.js';
 
 // ---------------------------------------------------------------------------
@@ -778,7 +779,7 @@ function go(i, how) {
   document.getElementById('btn-prev').disabled = current === 0;
   const last = current === ALL_TABS.length - 1;
   document.getElementById('btn-next').textContent = last
-    ? 'Enregistrer'
+    ? 'Lire au chef'
     : `${ALL_TABS[current + 1].title} ›`;
   if (ALL_TABS[current].id === 'bilan') {
     // L'écran Bilan est le plus long à construire : pendant le glissement, seulement
@@ -952,7 +953,7 @@ function renderReport() {
 }
 
 // ---------------------------------------------------------------------------
-// Export : Notes (feuille de partage) et presse-papiers
+// Envoi et presse-papiers
 // ---------------------------------------------------------------------------
 let toastTimer;
 function toast(msg) {
@@ -983,55 +984,8 @@ async function copy(text, msg = 'Copié', btn) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Enregistrement direct : un raccourci iOS (app Raccourcis) crée la note.
-// ---------------------------------------------------------------------------
-const SETTINGS_KEY = 'pdb-bspp:reglages';
-const settings = { direct: false, shortcut: 'PdB' };
-try { Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}); } catch { /* ignoré */ }
-
-function saveSettings() {
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignoré */ }
-}
-
-function runShortcut(text) {
-  const name = settings.shortcut.trim() || 'PdB';
-  window.location.href = `shortcuts://run-shortcut?name=${encodeURIComponent(name)}&input=text&text=${encodeURIComponent(text)}`;
-}
-
-function updateSettingsUI() {
-  $('direct-on').setAttribute('aria-pressed', String(settings.direct));
-  $('direct-off').setAttribute('aria-pressed', String(!settings.direct));
-  const pill = $('direct-pill');
-  pill.textContent = settings.direct ? 'Activé' : 'Désactivé';
-  pill.classList.toggle('on', settings.direct);
-  $('steps-name').textContent = settings.shortcut.trim() || 'PdB';
-  if ($('shortcut-name').value !== settings.shortcut) $('shortcut-name').value = settings.shortcut;
-  $('btn-share').textContent = settings.direct ? 'Créer la note' : 'Enregistrer dans Notes';
-  $('btn-share-sheet').hidden = !settings.direct;
-}
-
-function setupSettings() {
-  $('direct-on').addEventListener('click', () => { settings.direct = true; saveSettings(); updateSettingsUI(); });
-  $('direct-off').addEventListener('click', () => { settings.direct = false; saveSettings(); updateSettingsUI(); });
-  $('shortcut-name').addEventListener('input', (e) => { settings.shortcut = e.target.value; saveSettings(); updateSettingsUI(); });
-  $('btn-test-shortcut').addEventListener('click', () => {
-    runShortcut('Test Prise de bilans – Garde BSPP\nSi cette note apparaît dans Notes, l’enregistrement direct fonctionne. Vous pouvez la supprimer.');
-  });
-  $('btn-share-sheet').addEventListener('click', () => shareSheet());
-  updateSettingsUI();
-}
-
-async function share() {
-  if (settings.direct) {
-    runShortcut(buildReport(state).full);
-    toast('Création de la note…');
-    return;
-  }
-  return shareSheet();
-}
-
-async function shareSheet() {
+// Envoi au chef : feuille de partage (Messages, WhatsApp…), sinon copie.
+async function send() {
   const r = buildReport(state);
   if (navigator.share) {
     try {
@@ -1041,7 +995,60 @@ async function shareSheet() {
       if (e && e.name === 'AbortError') return;
     }
   }
-  await copy(r.full, 'Bilan copié : collez-le dans une nouvelle note');
+  await copy(r.full, 'Bilan copié : collez-le dans un message');
+}
+
+// ---------------------------------------------------------------------------
+// Bilan à lire au chef : plein écran, gros caractères, écran maintenu allumé.
+// ---------------------------------------------------------------------------
+const ZOOM_KEY = 'pdb-bspp:taille-lecture';
+const ZOOMS = [16, 18, 20, 23, 26, 30];
+let zoom = 2;
+try { zoom = Math.min(ZOOMS.length - 1, Math.max(0, Number(localStorage.getItem(ZOOM_KEY) ?? 2))); } catch { /* ignoré */ }
+let wakeLock = null;
+
+function applyZoom() {
+  $('reader').style.setProperty('--reader-font', `${ZOOMS[zoom]}px`);
+  $('btn-zoom-out').disabled = zoom === 0;
+  $('btn-zoom-in').disabled = zoom === ZOOMS.length - 1;
+  try { localStorage.setItem(ZOOM_KEY, String(zoom)); } catch { /* ignoré */ }
+}
+
+function renderReader() {
+  const b = activeBilan();
+  const v = victimSummary(state);
+  $('reader-title').textContent = v.name || `Victime ${b.n}`;
+  $('reader-sub').textContent = [v.who, v.heure].filter(Boolean).join(' · ');
+  const blocks = readerBlocks(state);
+  $('reader-body').replaceChildren(...(blocks.length ? blocks.map((bl) => {
+    const r = RAIL[bl.key === 's' ? 'situation' : bl.key];
+    const head = h('h3', {},
+      bl.letter ? h('span', { class: 'lt', 'aria-hidden': 'true' }, bl.letter) : null,
+      bl.title);
+    const sec = h('section', { class: `rblock ${bl.key}${bl.level ? ` ${bl.level}` : ''}` }, head,
+      bl.lines.length ? h('div', { class: 'rlines' }, ...bl.lines.map((l) => (l ? h('p', {}, l) : h('p', { class: 'gap' })))) : null);
+    if (r?.k) sec.style.cssText = `--c: var(--c-${r.k}); --ink: var(--ink-${r.k})`;
+    return sec;
+  }) : [h('p', { class: 'reader-empty' }, 'Bilan vide : commencez par l’étape S.')]));
+}
+
+async function openReader() {
+  renderReader();
+  applyZoom();
+  const el = $('reader');
+  el.hidden = false;
+  play(el, 'reader-in');
+  $('reader-body').scrollTo({ top: 0 });
+  $('btn-reader-close').focus({ preventScroll: true });
+  try { wakeLock = await navigator.wakeLock?.request('screen'); } catch { /* non disponible */ }
+}
+
+function closeReader() {
+  const el = $('reader');
+  if (el.hidden) return;
+  el.hidden = true;
+  wakeLock?.release?.().catch(() => {});
+  wakeLock = null;
 }
 
 // ---------------------------------------------------------------------------
@@ -1122,9 +1129,14 @@ window.addEventListener('resize', () => fitRailLabels());
 renderTabs();
 setupRailScrub();
 $('btn-prev').addEventListener('click', () => go(current - 1));
-$('btn-next').addEventListener('click', () => (current === ALL_TABS.length - 1 ? share() : go(current + 1)));
-$('btn-share').addEventListener('click', share);
-setupSettings();
+$('btn-next').addEventListener('click', () => (current === ALL_TABS.length - 1 ? openReader() : go(current + 1)));
+$('btn-read').addEventListener('click', openReader);
+$('btn-send').addEventListener('click', send);
+$('btn-reader-send').addEventListener('click', send);
+$('btn-reader-copy').addEventListener('click', (e) => copy(buildReport(state).full, 'Bilan copié', e.currentTarget));
+$('btn-reader-close').addEventListener('click', closeReader);
+$('btn-zoom-in').addEventListener('click', () => { zoom = Math.min(ZOOMS.length - 1, zoom + 1); applyZoom(); });
+$('btn-zoom-out').addEventListener('click', () => { zoom = Math.max(0, zoom - 1); applyZoom(); });
 $('btn-copy-all').addEventListener('click', (e) => copy(buildReport(state).full, 'Bilan complet copié', e.currentTarget));
 $('btn-victims').addEventListener('click', openSheet);
 $('btn-sheet-close').addEventListener('click', closeSheet);
@@ -1132,7 +1144,7 @@ $('btn-new').addEventListener('click', addBilan);
 $('btn-new-bottom').addEventListener('click', addBilan);
 twoStep($('btn-delete-current'), 'Confirmer la suppression', () => deleteBilan(store.activeId));
 $('sheet-backdrop').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeSheet(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeReader(); closeSheet(); } });
 // Les durées affichées (garrot posé depuis…, premiers signes il y a…) avancent toutes seules.
 setInterval(updateInfos, 30000);
 

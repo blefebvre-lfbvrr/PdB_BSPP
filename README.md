@@ -1,7 +1,8 @@
 # Prise de bilans – Garde BSPP
 
 Application web (PWA) pour faire un **bilan complet en garde BSPP, rapidement et sans rien oublier**,
-en suivant la démarche **S · X · A · B · C · D**, puis l’**enregistrer dans l’app Notes** du téléphone.
+en suivant la démarche **S · X · A · B · C · D**, puis le **rendre à son chef** : à l’oral, en le lisant à l’écran,
+ou par message.
 Même architecture que [Prise de bilans](https://github.com/blefebvre-lfbvrr/Prise_de_bilans).
 
 **Aucune donnée n’est envoyée sur Internet** : pas de serveur, pas de cloud, pas de compte.
@@ -19,10 +20,10 @@ et effacé avec « Supprimer ce bilan ».
 | **C** · Circulation | Signes de détresse, arrêt cardiaque (heure, témoin, RCP, DAE et chocs), FC, pouls, TA droite / gauche / habituelle, TRC. |
 | **D** · Neurologique | Signes de détresse, Glasgow détaillé, PC, orientation, pupilles, motricité / sensibilité, FAST et heure des premiers signes. |
 | Bilan compl. | **Bilans spécifiques** du mémo (malaise, douleur thoracique, asthme / OAP, douleur abdominale, AVC, convulsions, méningite, TC, traumatisme avec fiches lésion, rachis, plaie / brûlure, intoxication, grossesse / accouchement, hyper / hypothermie), **OPQRST**, signes associés, glycémie / température, antécédents **MHTA** (comme eFiBi). |
-| Gestes | Position d’attente, gestes, transmission (CM, 18 / 15 / 17, contact urgent), devenir (évacuation, LSP, refus avec décharge…), horaires. |
+| Gestes | Position d’attente, gestes, transmission (au chef, CM, 18 / 15 / 17, contact urgent), devenir (évacuation, LSP, refus avec décharge…), horaires. |
 | Surveillance | Une série de constantes horodatée à chaque contrôle, avec l’évolution. |
 | Identité | Nom, naissance, adresse, téléphone, personne à prévenir. |
-| Bilan | Texte prêt à transmettre : **synthèse**, circonstanciel, bilan vital (détresses en tête), complémentaire, gestes, surveillance, devenir, identité. Un bouton « Copier » par partie. |
+| Bilan | **Lire le bilan au chef** (plein écran), **Envoyer par message**, ou copier partie par partie : synthèse, circonstanciel, bilan vital (détresses en tête), complémentaire, gestes, surveillance, devenir, identité. |
 
 Chaque lettre a sa couleur ; un « ! » rouge sur la lettre signale un signe de détresse coché.
 Les valeurs anormales (FR, SpO2, FC, TA, Glasgow…) sont signalées et peuvent être cochées comme signes de détresse en un geste.
@@ -32,9 +33,14 @@ Chaque étape a un **aide-mémoire** repliable (mémo urgence et mémo bilans sp
 
 Glisser le doigt sur la colonne de gauche fait défiler les étapes, comme l’index des Contacts.
 
-« Enregistrer dans Notes » ouvre la feuille de partage d’iOS / Android : choisir **Notes**.
-Sur iPhone, l’**enregistrement direct** (écran Bilan) crée la note par un raccourci de l’app Raccourcis
-(action « Créer une note » avec « Entrée du raccourci ») ; le même raccourci que Prise de bilans peut servir.
+## Rendre le bilan au chef
+
+- **Lire le bilan au chef** ouvre le bilan en plein écran et en gros caractères, dans l’ordre où on le donne :
+  « En bref » (la synthèse en quelques lignes), circonstanciel, signes de détresse en rouge, puis un bloc par lettre
+  X, A, B, C, D, le complémentaire, les gestes, la surveillance, le devenir et l’identité.
+  A− / A+ règlent la taille du texte ; l’écran reste allumé pendant la lecture (si le téléphone le permet).
+- **Envoyer par message** ouvre la feuille de partage d’iOS / Android (Messages, WhatsApp…) avec le bilan complet en texte.
+- Les antécédents suivent le format **MHTA** (maladies, hospitalisations, traitements, allergies), comme eFiBi.
 
 **Plusieurs victimes** : le bouton en haut à droite liste les bilans en cours et permet de passer de l’un à l’autre.
 
