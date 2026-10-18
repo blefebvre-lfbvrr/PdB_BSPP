@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#15336b"/>
+  <text x="256" y="282" text-anchor="middle" font-family="Inter, -apple-system, 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="190" letter-spacing="-6" fill="#f08a00">PdB</text>
+  <g font-family="Inter, -apple-system, 'Segoe UI', Arial, sans-serif" font-weight="900" font-size="58" text-anchor="middle" fill="#ffffff">
+    <rect x="86" y="334" width="60" height="60" rx="12" fill="#c62828"/><text x="116" y="384">X</text>
+    <rect x="156" y="334" width="60" height="60" rx="12" fill="#e6a000"/><text x="186" y="384" fill="#15336b">A</text>
+    <rect x="226" y="334" width="60" height="60" rx="12" fill="#1f63c4"/><text x="256" y="384">B</text>
+    <rect x="296" y="334" width="60" height="60" rx="12" fill="#c2185b"/><text x="326" y="384">C</text>
+    <rect x="366" y="334" width="60" height="60" rx="12" fill="#6a43b5"/><text x="396" y="384">D</text>
+  </g>
+</svg>

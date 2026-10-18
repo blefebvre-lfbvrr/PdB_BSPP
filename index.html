@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15336b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Pas de barre d'état transparente : sur iOS 26 elle réduit la zone d'affichage
+       et laisse une bande morte en bas de l'écran (WebKit bug 301108). -->
+  <meta name="apple-mobile-web-app-title" content="PdB BSPP">
+  <meta name="format-detection" content="telephone=no">
+  <title>Prise de bilans – Garde BSPP</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="chrome" id="chrome">
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">PdB</span>
+      <span class="brand-name">Garde BSPP</span>
+    </div>
+    <button type="button" class="victim-switch" id="btn-victims" aria-haspopup="dialog" aria-controls="sheet">
+      <span class="victim-dot" id="victim-dot" aria-hidden="true"></span>
+      <span class="victim-label" id="victim-label">Victime 1</span>
+      <span class="victim-count" id="victim-count" hidden></span>
+      <span class="chev" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+  </div>
+
+  <nav class="rail" id="tabs" role="tablist" aria-orientation="vertical" aria-label="Étapes du bilan : S, X, A, B, C, D, puis complémentaire">
+    <span class="rail-indicator" id="rail-indicator" aria-hidden="true"></span>
+  </nav>
+
+  <main id="main">
+    <div id="panels"></div>
+    <section class="panel" id="panel-bilan" role="tabpanel" hidden>
+      <div class="summary" id="summary"></div>
+      <div class="group">
+        <p class="hint">
+          Rien n’est envoyé sur Internet. La synthèse sert à passer le bilan au téléphone ;
+          enregistrez le bilan complet dans l’app Notes pour remplir la fiche.
+        </p>
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-share">Enregistrer dans Notes</button>
+          <button type="button" class="btn" id="btn-copy-all">Copier tout</button>
+          <button type="button" class="btn" id="btn-share-sheet" hidden>Autre app…</button>
+        </div>
+        <div id="missing" class="missing" hidden></div>
+      </div>
+
+      <details class="group settings" id="direct-settings">
+        <summary>
+          <span class="settings-title">Enregistrement direct dans Notes</span>
+          <span class="pill" id="direct-pill">Désactivé</span>
+        </summary>
+        <div class="settings-body">
+          <p class="hint">
+            Sur iPhone, un raccourci de l’app Raccourcis crée la note à votre place : plus besoin de
+            choisir Notes dans le menu de partage. Tout reste sur le téléphone.
+          </p>
+          <ol class="steps">
+            <li>Ouvrez l’app <strong>Raccourcis</strong> et touchez <strong>+</strong> pour créer un raccourci.</li>
+            <li>Ajoutez l’action <strong>Créer une note</strong> (app Notes).</li>
+            <li>Dans cette action, touchez le texte de la note et choisissez <strong>Entrée du raccourci</strong>.
+              Vous pouvez aussi choisir un dossier, par exemple «&nbsp;Bilans&nbsp;».</li>
+            <li>Renommez le raccourci <strong id="steps-name">PdB</strong> (touchez son nom en haut), puis <strong>OK</strong>.</li>
+            <li>Ici, activez l’option ci-dessous et touchez <strong>Créer une note de test</strong>.
+              La première fois, autorisez Raccourcis à accéder à Notes.</li>
+          </ol>
+          <div class="field">
+            <label for="shortcut-name">Nom du raccourci</label>
+            <input type="text" id="shortcut-name" autocomplete="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="field tri">
+            <span class="label">Utiliser le raccourci pour «&nbsp;Enregistrer&nbsp;»</span>
+            <div class="seg" role="group">
+              <button type="button" class="opt" id="direct-on" aria-pressed="false">Oui</button>
+              <button type="button" class="opt no" id="direct-off" aria-pressed="true">Non</button>
+            </div>
+          </div>
+          <button type="button" class="btn block" id="btn-test-shortcut">Créer une note de test</button>
+          <p class="help">
+            iOS peut demander «&nbsp;Ouvrir dans Raccourcis&nbsp;?&nbsp;» : touchez Ouvrir, puis revenez à l’app d’un glissement.
+          </p>
+        </div>
+      </details>
+      <div id="report-sections"></div>
+      <div class="end-actions">
+        <button type="button" class="btn" id="btn-new-bottom">Nouvelle victime</button>
+        <button type="button" class="btn danger" id="btn-delete-current">Supprimer ce bilan</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <button type="button" class="btn" id="btn-prev">‹ Précédent</button>
+    <button type="button" class="btn primary" id="btn-next">Suivant ›</button>
+  </footer>
+
+  <div class="sheet-backdrop" id="sheet-backdrop" hidden>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <h2 id="sheet-title">Bilans en cours</h2>
+        <button type="button" class="btn mini" id="btn-sheet-close">Fermer</button>
+      </div>
+      <ul class="victims" id="victims"></ul>
+      <button type="button" class="btn primary block" id="btn-new">+ Nouvelle victime</button>
+      <p class="hint small">
+        Les bilans restent uniquement sur ce téléphone. Supprimez-les une fois enregistrés dans Notes.
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
